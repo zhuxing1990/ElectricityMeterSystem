@@ -1,0 +1,78 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.vunke.electricity"
+        minSdkVersion 15
+        targetSdkVersion 26
+        versionCode 15
+        versionName "15.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            android.applicationVariants.all {
+                variant ->
+                    variant.outputs.all {
+                        output ->
+                            def outputFile = output.outputFile
+                            if (outputFile != null && outputFile.name.contains('release')) {
+                                def fileName = "ElectricityMeterSystem_${defaultConfig.versionCode}_${defaultConfig.versionName}_${releaseTime()}.apk"
+                                outputFileName = fileName;
+                            } else if (outputFile != null && outputFile.name.contains('debug')) {
+                                def fileName = "ElectricityMeterSystem_${defaultConfig.versionCode}_${defaultConfig.versionName}_${releaseTime()}_debug.apk"
+                                outputFileName = fileName;
+                            }
+                    }
+            }
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+}
+
+def releaseTime() {
+    return new Date().format("yyMMdd", TimeZone.getTimeZone("UTC"))
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation 'com.ohmerhe.kolley:kolley:0.3.0'
+    implementation "org.jetbrains.anko:anko-commons:$anko_version"
+    implementation 'org.jetbrains.anko:anko-sqlite:0.10.0'
+    // recyclerview
+    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
+//    implementation 'com.android.support:multidex:1.0.1'
+
+    implementation 'io.reactivex.rxjava2:rxandroid:+'
+    implementation 'io.reactivex.rxjava2:rxjava:+'
+    implementation 'io.reactivex.rxjava2:rxkotlin:+'
+    //OkGo  基础请求
+//    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.lzy.net:okgo:+'
+    //OkGo 基于rx的请求
+    implementation 'com.lzy.net:okrx:+'
+    //OkGo 下载管理和上传管理扩展，根据需要添加
+    implementation 'com.lzy.net:okserver:+'
+    //gson
+    implementation 'com.google.code.gson:gson:2.8.2'
+
+    //compile 'com.github.bumptech.glide:glide:3.5.2'
+    implementation 'com.github.bumptech.glide:okhttp3-integration:1.5.0'
+    testImplementation 'junit:junit:4.12'
+
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+}
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ElectricityMeterSystem</string>
+    <string name="input_num0">001600054791</string>
+    <string name="title_activity_test">TestActivity</string>
+</resources>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <Button
+        android:id="@+id/bt_Send"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:text="开闸" />
+
+    <Button
+        android:id="@+id/bt_Send2"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:text="关闸" />
+    <EditText
+        android:id="@+id/main_edit1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="12"
+        android:inputType="text"
+        android:text="@string/input_num0" />
+    <Button
+        android:id="@+id/bt_Send3"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:text="查表"/>
+    <Button
+        android:id="@+id/bt_Receive"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:text="接收"/>
+
+</LinearLayout>
