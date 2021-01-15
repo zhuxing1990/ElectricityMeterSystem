@@ -20,21 +20,28 @@ object ReadDataUtil{
             LogUtil.i(TAG, "get Read size:${byteArray.size}")
             if (byteArray.size > 10 && byteArray.size == 22) {
                 LogUtil.i(TAG, "Read: 开始解析电量")
-                val num = byteArray.size - 10
-                val b1 = byteArray[num]
-                val b2 = byteArray[num + 1]
-                var b3 = byteArray[byteArray.size-1]
-                if (ElectrictyMeterUtil.authCode(b1, b2,b3)) {
-                    LogUtil.i(TAG, "Read: 电量应答成功，数据长度正常")
-                    hextodl = ElectrictyMeterUtil.getElectric(byteArray)
-                    var hextodl2 = ElectrictyMeterUtil.getElectric(byteArray)
-                    LogUtil.i(TAG, "Read: hextodl:$hextodl" )
-                    LogUtil.i(TAG, "Read: hextodl2:$hextodl2" )
-                    var meterNo = ElectrictyMeterUtil.getMeterNo(byteArray)
-                    LogUtil.i(TAG,"Read:$meterNo  ")
-                    DeviceUtil.uploadMeterReading(DeviceRunnable.context!!, meterNo,hextodl,hextodl2,Utils.bytesToHex(byteArray).toUpperCase())
-                    DeviceUtil.getCostInfo(DeviceRunnable.context!!,meterNo)
+                var a = byteArray[0]
+                var b = byteArray[1]
+                var c = byteArray[2]
+                var d = byteArray[3]
+                if (ElectrictyMeterUtil.getFE_Code(a,b,c,d)){
+                    LogUtil.i(DeviceRunnable.TAG, "onDataReceived: 验证 前4位 FE 正常")
+                    val num = byteArray.size - 10
+                    val b1 = byteArray[num]
+                    val b2 = byteArray[num + 1]
+                    var b3 = byteArray[byteArray.size-1]
+                    if (ElectrictyMeterUtil.authCode(b1, b2,b3)) {
+                        LogUtil.i(TAG, "Read: 电量应答成功，数据长度正常")
+                        hextodl = ElectrictyMeterUtil.getElectric(byteArray)
+                        var hextodl2 = ElectrictyMeterUtil.getElectric(byteArray)
+                        LogUtil.i(TAG, "Read: hextodl:$hextodl" )
+                        LogUtil.i(TAG, "Read: hextodl2:$hextodl2" )
+                        var meterNo = ElectrictyMeterUtil.getMeterNo(byteArray)
+                        LogUtil.i(TAG,"Read:$meterNo  ")
+                        DeviceUtil.uploadMeterReading(DeviceRunnable.context!!, meterNo,hextodl,hextodl2,Utils.bytesToHex(byteArray).toUpperCase())
+                        DeviceUtil.getCostInfo(DeviceRunnable.context!!,meterNo)
 //                    return hextodl
+                    }
                 }
             }
         }catch (e:Exception){

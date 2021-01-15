@@ -30,5 +30,13 @@ class ComPort(context:Context) {
         }
         return serialPort!!
     }
-
+    fun initComPort2400(comPort:String):SerialPort{
+        var serialPort: SerialPort? =null
+        try {
+            serialPort = SerialPort(comPort,BaseConfig.BAUDRATE_2400,8,1, 'e'.toInt(),true)
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
+        return serialPort!!
+    }
 }

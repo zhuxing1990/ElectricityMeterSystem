@@ -8,6 +8,7 @@ import com.vunke.electricity.dao.MeterDao;
 import com.vunke.electricity.db.Meter;
 import com.vunke.electricity.server.WebPageMap;
 import com.vunke.electricity.server.WebRequest;
+import com.vunke.electricity.server.workpage.ChangetBaudRatePage;
 import com.vunke.electricity.server.workpage.CloseDevicePage;
 import com.vunke.electricity.server.workpage.KillMySelfPage;
 import com.vunke.electricity.server.workpage.OpenDevicePage;
@@ -44,6 +45,7 @@ public class WebConfig {
     public static final String QUERY_METER_PAGE = "/queryMeterPage.do";
     public static final String KILL_MY_SELF_PAGE = "/killMySelfPage.do";
     public static final String QUERY_STATUS_PAGE = "/queryStatusPage.do";
+    public static final String CHANGE_BAUDRATE_PAGE = "/ChangetBaudRatePage.do";
     private static Context context;
     public static void init(Context mcontext) {
             context = mcontext;
@@ -56,6 +58,7 @@ public class WebConfig {
         WebPageMap.getInstance().registerWebPage(QUERY_METER_PAGE, QueryMeterPage.class);
         WebPageMap.getInstance().registerWebPage(KILL_MY_SELF_PAGE, KillMySelfPage.class);
         WebPageMap.getInstance().registerWebPage(QUERY_STATUS_PAGE, QueryStatusPage.class);
+        WebPageMap.getInstance().registerWebPage(CHANGE_BAUDRATE_PAGE, ChangetBaudRatePage.class);
 
         try {
             LogUtil.d(TAG, MACUtil.getSERIAL()+" \n init: " + EncryptToolNew.DESEncrypt(MACUtil.getSERIAL(), ENCRYPT_KEY));

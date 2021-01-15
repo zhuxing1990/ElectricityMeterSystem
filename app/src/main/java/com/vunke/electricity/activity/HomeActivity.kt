@@ -3,13 +3,15 @@ package com.vunke.electricity.activity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.util.Log
 import android.widget.Toast
 import com.vunke.electricity.R
 import com.vunke.electricity.dao.MeterDao
 import com.vunke.electricity.db.Meter
 import com.vunke.electricity.device.DeviceUtil
-import com.vunke.electricity.device.DeviceUtil.uploadMeterReading
 import com.vunke.electricity.device.ElectrictyMeterUtil
+import com.vunke.electricity.device.WeiShenElectricityUtil
+import com.vunke.electricity.service.DeviceRunnable
 import com.vunke.electricity.util.LogUtil
 import com.vunke.electricity.util.MACUtil
 import com.vunke.electricity.util.Utils
@@ -35,28 +37,47 @@ class HomeActivity :SerialPortActivity() {
         if (buffer.size > 10 && buffer.size == 22) {
             LogUtil.i(TAG, "onDataReceived: 开始解析电量")
             home_message.append("\n开始解析电量")
-            val num = buffer.size - 10
-            val b1 = buffer[num]
-            val b2 = buffer[num + 1]
-            var b3 = buffer[buffer.size-1]
-            if (ElectrictyMeterUtil.authCode(b1, b2,b3)) {
-                LogUtil.i(TAG, "onDataReceived: 电量应答成功，数据长度正常")
-                val hextodl = ElectrictyMeterUtil.getElectric(buffer)
-                val hextodl2 = ElectrictyMeterUtil.getElectric2(buffer)
-                LogUtil.i(TAG, "onDataReceived: hextodl：" + hextodl)
-                LogUtil.i(TAG, "onDataReceived: hextodl2：" + hextodl2)
-                home_message.append("\n当前已用电量：$hextodl，设备编号:${mymeter.meterNo}")
-                mymeter.beginCheckNum = hextodl
-                Toast.makeText(this, "当前已用电量" + hextodl, Toast.LENGTH_SHORT).show()
-               var meterNo  =  ElectrictyMeterUtil.getMeterNo(buffer)
-                mymeter.meterNo = meterNo
-                uploadMeterReading(mcontext, meterNo,hextodl, hextodl2 , Utils.bytesToHex(buffer).toUpperCase());
-            } else {
-                LogUtil.i(TAG, "onDataReceived: b1:" + Integer.toHexString(b1.toInt()) + "\t  b2:" + Integer.toHexString(b2.toInt()))
-                LogUtil.i(TAG, "onDataReceived: 获取正常应答 失败或者 数据域长度 不够")
+            var a = buffer[0]
+            var b = buffer[1]
+            var c = buffer[2]
+            var d = buffer[3]
+            if (ElectrictyMeterUtil.getFE_Code(a,b,c,d)){
+                val num = buffer.size - 10
+                val b1 = buffer[num]
+                val b2 = buffer[num + 1]
+                var b3 = buffer[buffer.size-1]
+                if (ElectrictyMeterUtil.authCode(b1, b2,b3)) {
+                    LogUtil.i(TAG, "onDataReceived: 电量应答成功，数据长度正常")
+                    val hextodl = ElectrictyMeterUtil.getElectric(buffer)
+                    val hextodl2 = ElectrictyMeterUtil.getElectric2(buffer)
+                    LogUtil.i(TAG, "onDataReceived: hextodl：" + hextodl)
+                    LogUtil.i(TAG, "onDataReceived: hextodl2：" + hextodl2)
+                    home_message.append("\n当前已用电量：$hextodl，设备编号:${mymeter.meterNo}")
+                    mymeter.beginCheckNum = hextodl
+                    Toast.makeText(this, "当前已用电量" + hextodl, Toast.LENGTH_SHORT).show()
+                    var meterNo  =  ElectrictyMeterUtil.getMeterNo(buffer)
+                    mymeter.meterNo = meterNo
+                    DeviceUtil.uploadMeterReading(mcontext, meterNo,hextodl, hextodl2 , Utils.bytesToHex(buffer).toUpperCase());
+                } else {
+                    LogUtil.i(TAG, "onDataReceived: b1:" + Integer.toHexString(b1.toInt()) + "\t  b2:" + Integer.toHexString(b2.toInt()))
+                    LogUtil.i(TAG, "onDataReceived: 获取正常应答 失败或者 数据域长度 不够")
+                }
+            }else{
+                LogUtil.i(DeviceRunnable.TAG, "onDataReceived: 验证 前4位 FE ,获取正常应答 失败")
             }
-        } else {
-
+        } else if (buffer.size>10 && buffer.size ==20){
+            LogUtil.i(DeviceRunnable.TAG,"onDataReceived size20")
+            val meterNo1 = WeiShenElectricityUtil.getMeterNo(buffer)
+            Log.i(DeviceRunnable.TAG, "onDataReceived size20 weishen meterNo:$meterNo1")
+            val hextodl = ElectrictyMeterUtil.getElectric(buffer)
+            val hextodl2 = ElectrictyMeterUtil.getElectric2(buffer)
+            LogUtil.i(DeviceRunnable.TAG, "onDataReceived size20 getElectric:weishen hextodl:$hextodl")
+            LogUtil.i(DeviceRunnable.TAG, "onDataReceived size20 getElectric:weishen hextodl2$hextodl2")
+            mymeter!!.meterNo = meterNo1
+            LogUtil.i(DeviceRunnable.TAG,"onDataReceived:$meterNo1")
+            mymeter.beginCheckNum = hextodl
+            DeviceUtil.uploadMeterReading(DeviceRunnable.context!!, meterNo1,hextodl,hextodl2,Utils.bytesToHex(buffer).toUpperCase())
+            DeviceUtil.getCostInfo(DeviceRunnable.context!!,meterNo1)
         }
     }
     lateinit var mymeter:Meter;

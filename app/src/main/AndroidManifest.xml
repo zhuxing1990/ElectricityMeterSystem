@@ -29,12 +29,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activity.MainActivity">
-             <!--<intent-filter>-->
-             <!--<action android:name="android.intent.action.MAIN" />-->
-             <!--<category android:name="android.intent.category.HOME"/>-->
-             <!--<category android:name="android.intent.category.LAUNCHER" />-->
-             <!--<category android:name="android.intent.category.DEFAULT"/>-->
-             <!--</intent-filter>-->
+<!--             <intent-filter>-->
+<!--             <action android:name="android.intent.action.MAIN" />-->
+<!--             <category android:name="android.intent.category.HOME"/>-->
+<!--             <category android:name="android.intent.category.LAUNCHER" />-->
+<!--             <category android:name="android.intent.category.DEFAULT"/>-->
+<!--             </intent-filter>-->
         </activity>
         <activity android:name=".activity.HomeActivity">
             <intent-filter>
@@ -45,12 +45,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.TestActivity2">
-            <!--<intent-filter>-->
-            <!--<action android:name="android.intent.action.MAIN" />-->
-            <!--<category android:name="android.intent.category.HOME" />-->
-            <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--<category android:name="android.intent.category.DEFAULT" />-->
-            <!--</intent-filter>-->
+<!--            <intent-filter>-->
+<!--            <action android:name="android.intent.action.MAIN" />-->
+<!--            <category android:name="android.intent.category.HOME" />-->
+<!--            <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            <category android:name="android.intent.category.DEFAULT" />-->
+<!--            </intent-filter>-->
         </activity>
         <activity android:name=".activity.RestartActivity"
             android:enabled="true"

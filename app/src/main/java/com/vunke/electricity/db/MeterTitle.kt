@@ -25,4 +25,5 @@ object MeterTitle{
     var USER_ID ="userId"
     var ROOM_LEVEL="roomLevel"
     var MAGNIFICATION="magnification"
+    var BRAND="brand"
 }

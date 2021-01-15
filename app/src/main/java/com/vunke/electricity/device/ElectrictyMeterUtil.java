@@ -1,7 +1,6 @@
 package com.vunke.electricity.device;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.vunke.electricity.util.LogUtil;
 import com.vunke.electricity.util.Utils;
@@ -18,7 +17,10 @@ public class ElectrictyMeterUtil {
         byte [] bt = new byte[]{(byte)0x81,0x06,0x16};
         return b1 == bt[0] && b2 == bt[1]&& b3 == bt[2];
     }
-
+    public static boolean getFE_Code(byte a,byte b,byte c,byte d){
+        byte fe = (byte)0xFE;
+        return fe==a&&fe ==b&&fe==c&fe==d;
+    }
     /**
      * 根据表地址查询表数据
      * @param JeteId
@@ -244,9 +246,9 @@ public class ElectrictyMeterUtil {
         for (int i = 0; i <= 3; i++){
             DataColle[i] = (byte)(b[i]-0x33);
             String hex = Integer.toHexString(DataColle[i] & 0xFF);
-            Log.i(TAG, "getElectric2: hex:"+hex);
+            LogUtil.i(TAG, "getElectric2: hex:"+hex);
             int a = Integer.valueOf(hex);
-            Log.i(TAG, "getElectric2: a:"+a);
+            LogUtil.i(TAG, "getElectric2: a:"+a);
             switch (i){
                 case 3:
                     double newA0 = a *10000;

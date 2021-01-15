@@ -177,25 +177,34 @@ class DeviceRunnable(context: Context):Runnable{
 //        LogUtil.i(TAG, "onDataReceived: buff:" + buff)
             if (buffer.size > 10 && buffer.size == 22) {
                 LogUtil.i(TAG, "onDataReceived: 开始解析电量")
-                val num = buffer.size - 10
-                val b1 = buffer[num]
-                val b2 = buffer[num + 1]
-                var b3 = buffer[buffer.size-1]
-                if (ElectrictyMeterUtil.authCode(b1, b2,b3)) {
-                    LogUtil.i(TAG, "onDataReceived: 电量应答成功，数据长度正常")
-                    val hextodl = ElectrictyMeterUtil.getElectric(buffer)
-                    val hextodl2 = ElectrictyMeterUtil.getElectric2(buffer)
-                    LogUtil.i(TAG, "onDataReceived: hextodl:$hextodl" )
-                    LogUtil.i(TAG, "onDataReceived: hextodl2:$hextodl2" )
-                    var meterNo = ElectrictyMeterUtil.getMeterNo(buffer)
-                    meter!!.meterNo = meterNo
-                    LogUtil.i(TAG,"onDataReceived:$meterNo  ")
-                    meter.beginCheckNum = hextodl
-                    DeviceUtil.uploadMeterReading(context!!, meterNo,hextodl,hextodl2,Utils.bytesToHex(buffer).toUpperCase())
-                    DeviceUtil.getCostInfo(context!!,meterNo)
-                } else {
-                    LogUtil.i(TAG, "onDataReceived: b1:${Integer.toHexString(b1.toInt())}" +   "\t  b2:${Integer.toHexString(b2.toInt())}" )
-                    LogUtil.i(TAG, "onDataReceived: 获取正常应答 失败或者 数据域长度 不够")
+                var a = buffer[0]
+                var b = buffer[1]
+                var c = buffer[2]
+                var d = buffer[3]
+                if (ElectrictyMeterUtil.getFE_Code(a,b,c,d)){
+                    LogUtil.i(TAG, "onDataReceived: 验证 前4位 FE 正常")
+                    val num = buffer.size - 10
+                    val b1 = buffer[num]
+                    val b2 = buffer[num + 1]
+                    var b3 = buffer[buffer.size-1]
+                    if (ElectrictyMeterUtil.authCode(b1, b2,b3)) {
+                        LogUtil.i(TAG, "onDataReceived: 电量应答成功，数据长度正常")
+                        val hextodl = ElectrictyMeterUtil.getElectric(buffer)
+                        val hextodl2 = ElectrictyMeterUtil.getElectric2(buffer)
+                        LogUtil.i(TAG, "onDataReceived: hextodl:$hextodl" )
+                        LogUtil.i(TAG, "onDataReceived: hextodl2:$hextodl2" )
+                        var meterNo = ElectrictyMeterUtil.getMeterNo(buffer)
+                        meter!!.meterNo = meterNo
+                        LogUtil.i(TAG,"onDataReceived:$meterNo  ")
+                        meter.beginCheckNum = hextodl
+                        DeviceUtil.uploadMeterReading(context!!, meterNo,hextodl,hextodl2,Utils.bytesToHex(buffer).toUpperCase())
+                        DeviceUtil.getCostInfo(context!!,meterNo)
+                    } else {
+                        LogUtil.i(TAG, "onDataReceived: b1:${Integer.toHexString(b1.toInt())}" +   "\t  b2:${Integer.toHexString(b2.toInt())}" )
+                        LogUtil.i(TAG, "onDataReceived: 获取正常应答 失败或者 数据长度 不够")
+                    }
+                }else{
+                    LogUtil.i(TAG, "onDataReceived: 验证 前4位 FE ,获取正常应答 失败")
                 }
             }else if (buffer.size>10 && buffer.size ==20){
                 OldBuffer = buffer
@@ -206,11 +215,11 @@ class DeviceRunnable(context: Context):Runnable{
                 val hextodl2 = ElectrictyMeterUtil.getElectric2(buffer)
                 LogUtil.i(TAG, "onDataReceived size20 getElectric:weishen hextodl:$hextodl")
                 LogUtil.i(TAG, "onDataReceived size20 getElectric:weishen hextodl2$hextodl2")
-//                meter!!.meterNo = meterNo1
-//                LogUtil.i(TAG,"onDataReceived:$meterNo1")
-//                meter.beginCheckNum = hextodl
-//                DeviceUtil.uploadMeterReading(context!!, meterNo1,hextodl,hextodl2,Utils.bytesToHex(buffer).toUpperCase())
-//                DeviceUtil.getCostInfo(context!!,meterNo1)
+                meter!!.meterNo = meterNo1
+                LogUtil.i(TAG,"onDataReceived:$meterNo1")
+                meter.beginCheckNum = hextodl
+                DeviceUtil.uploadMeterReading(context!!, meterNo1,hextodl,hextodl2,Utils.bytesToHex(buffer).toUpperCase())
+                DeviceUtil.getCostInfo(context!!,meterNo1)
             }else if (buffer.size == 16) {
                 LogUtil.i(TAG,"onDataReceived size16")
                 val meterNo = ElectrictyMeterUtil.getDeviceMeterNo(buffer)

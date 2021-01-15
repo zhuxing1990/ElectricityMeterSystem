@@ -11,6 +11,7 @@ import com.vunke.electricity.db.Meter;
 import com.vunke.electricity.device.ComPort;
 import com.vunke.electricity.device.DeviceUtil;
 import com.vunke.electricity.device.ElectrictyMeterUtil;
+import com.vunke.electricity.device.WeiShenElectricityUtil;
 import com.vunke.electricity.server.WebPage;
 import com.vunke.electricity.server.WebRequest;
 import com.vunke.electricity.server.config.EncryptToolNew;
@@ -32,7 +33,7 @@ import static java.lang.Thread.sleep;
  */
 
 public class CloseDevicePage implements WebPage {
-    private static final String TAG = "OpenDevicePage";
+    private static final String TAG = "CloseDevicePage";
     @Override
     public void page(Context context, WebRequest request, final PrintWriter out, OutputStream rawOut) throws Throwable {
             String meterNo = request.queryParameter(WebConfig.ACCOUNT_KEY);
@@ -54,7 +55,15 @@ public class CloseDevicePage implements WebPage {
                     intent.setAction(ConfigService.Companion.getSTOP_QUERY_METER());
                     context.startService(intent);
                     DeviceRunnable.Companion.getInstance().pause0();
-                    byte[] bytes = ElectrictyMeterUtil.FrmatCloseCMD(meter.getMeterNo());
+                    String brand = meter.getBrand();
+                    byte[] bytes;
+                    if (!TextUtils.isEmpty(brand)&& "1".equals(brand)){
+                        bytes = WeiShenElectricityUtil.FrmatCloseCMD(meter.getMeterNo());
+                        LogUtil.i(TAG,"WeiShen FrmatCloseCMD:"+ Utils.bytesToHex(bytes).toUpperCase());
+                    }else{
+                        bytes = ElectrictyMeterUtil.FrmatCloseCMD(meter.getMeterNo());
+                        LogUtil.i(TAG,"FrmatCloseCMD:"+ Utils.bytesToHex(bytes).toUpperCase());
+                    }
                     serialPort.sendData(bytes);
                     responseData.setCode(200);
                     DeviceUtil.INSTANCE.upLoadGATELog(context,meter,bytes,0,0);

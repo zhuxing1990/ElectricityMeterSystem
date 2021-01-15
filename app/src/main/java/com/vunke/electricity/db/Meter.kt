@@ -12,7 +12,9 @@ data class Meter (
         var endCheckNumTwo:Double,//上次抄表数
         var checkDate:String,//创建时间
         var collectorId:String,//采集器ID
-        var comPort:String,
+        var comPort:String,//COM端口
         var userId:Long,//用户ID
         var roomLevel:String,//房价等级
-        var magnification:Long)//倍率
+        var magnification:Long, //倍率
+        var brand:String//品牌
+)

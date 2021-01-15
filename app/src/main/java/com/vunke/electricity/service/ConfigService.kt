@@ -15,6 +15,7 @@ import com.vunke.electricity.dao.MeterDao
 import com.vunke.electricity.device.ComPort
 import com.vunke.electricity.device.DeviceUtil
 import com.vunke.electricity.device.ElectrictyMeterUtil
+import com.vunke.electricity.device.WeiShenElectricityUtil
 import com.vunke.electricity.modle.ConfigInfoBean
 import com.vunke.electricity.modle.MetersBean
 import com.vunke.electricity.util.LogUtil
@@ -219,8 +220,13 @@ class ConfigService : Service() {
             override fun onNext(t: MetersBean) {
                 LogUtil.i(TAG, "startQuert onNext:${t.toString()}")
                 if (t.serialPort != null && t.serialPort.inputStream != null) {
-                    LogUtil.i(TAG, "startQuert start query ")
-                    t.serialPort.sendData(ElectrictyMeterUtil.FrmatQueryCMD(t.meter.meterNo))
+                    if (!TextUtils.isEmpty(t.meter.brand)&& "1".equals(t.meter.brand)){
+                        LogUtil.i(TAG,"startQuert start query is weisheng device")
+                        t.serialPort.sendData(WeiShenElectricityUtil.FrmatQueryCMD(t.meter.meterNo))
+                    }else {//if ("0".equals(t.meter.brand))
+                        LogUtil.i(TAG,"startQuert start query is default device")
+                        t.serialPort.sendData(ElectrictyMeterUtil.FrmatQueryCMD(t.meter.meterNo))
+                    }
                 }
             }
         }

@@ -48,7 +48,7 @@ object DeviceUtil{
                                 if (bizBody != null && bizBody.size != 0) {
                                     val list = ArrayList<Meter>()
                                     for (bizBodyBean in bizBody) {
-                                        val meter = Meter(bizBodyBean.meterId, bizBodyBean.meterNo, bizBodyBean.beginCheckNum, bizBodyBean.endCheckNum, bizBodyBean.endCheckNumTwo,bizBodyBean.checkDate, bizBodyBean.collectorId, bizBodyBean.comPort,bizBodyBean.userId, bizBodyBean.roomLevel,bizBodyBean.magnification)
+                                        val meter = Meter(bizBodyBean.meterId, bizBodyBean.meterNo, bizBodyBean.beginCheckNum, bizBodyBean.endCheckNum, bizBodyBean.endCheckNumTwo,bizBodyBean.checkDate, bizBodyBean.collectorId, bizBodyBean.comPort,bizBodyBean.userId, bizBodyBean.roomLevel,bizBodyBean.magnification,bizBodyBean.brand)
                                         list.add(meter)
                                     }
                                     val meterDao = MeterDao(context)
@@ -249,16 +249,22 @@ object DeviceUtil{
                                                         }else{
                                                             LogUtil.i(TAG,"getBalance 余额充足，开闸")
                                                             OpenMeter(context, meter)
-                                                            var AvailableDays =getAvailableDays(meter, price, amount)
-                                                            var DefaultWaringValue = SPUtils.getLong(context, ConfigService.WaringValue, ConfigService.DefaultWaringValue)
-                                                            LogUtil.i(TAG, "getBalance: 短信阀值:$DefaultWaringValue")
-                                                            LogUtil.i(TAG, "getBalance: 余额可用天数:$AvailableDays" )
-                                                            if (AvailableDays<DefaultWaringValue){
+                                                            if(amount<100){
                                                                 LogUtil.i(TAG,"getBalance 余额不足")
                                                                 var smsType = "4"
                                                                 getSendData(context, meter.meterNo, smsType, userMobile, userName, amount)
-                                                            } else{
-                                                                LogUtil.i(TAG,"getBalance 余额大于阀值")
+                                                            }else{
+                                                                var AvailableDays =getAvailableDays(meter, price, amount)
+                                                                var DefaultWaringValue = SPUtils.getLong(context, ConfigService.WaringValue, ConfigService.DefaultWaringValue)
+                                                                LogUtil.i(TAG, "getBalance: 短信阀值:$DefaultWaringValue")
+                                                                LogUtil.i(TAG, "getBalance: 余额可用天数:$AvailableDays" )
+                                                                if (AvailableDays<DefaultWaringValue){
+                                                                    LogUtil.i(TAG,"getBalance 余额不足")
+                                                                    var smsType = "4"
+                                                                    getSendData(context, meter.meterNo, smsType, userMobile, userName, amount)
+                                                                } else{
+                                                                    LogUtil.i(TAG,"getBalance 余额大于阀值")
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -328,19 +334,37 @@ object DeviceUtil{
     }
     private fun CloseMeter(context: Context, meter: Meter) {
         LogUtil.i(TAG,"start Meter Close : ${meter.meterNo}")
-        var serialPort = ComPort.getInstance(context).initComPort(meter.comPort)
-        var bytes = ElectrictyMeterUtil.FrmatCloseCMD(meter.meterNo)
-        serialPort.sendData(bytes)
-        upLoadGATELog(context,meter,bytes,0,1)
-        getStatus(context,meter,serialPort)
+        var brand = meter.brand;
+        if (!TextUtils.isEmpty(brand) && "1" == brand){
+            var serialPort = ComPort.getInstance(context).initComPort(meter.comPort)
+            var bytes = WeiShenElectricityUtil.FrmatCloseCMD(meter.meterNo)
+            serialPort.sendData(bytes)
+            upLoadGATELog(context,meter,bytes,0,1)
+//            getStatus(context,meter,serialPort)
+        }else{
+            var serialPort = ComPort.getInstance(context).initComPort(meter.comPort)
+            var bytes = ElectrictyMeterUtil.FrmatCloseCMD(meter.meterNo)
+            serialPort.sendData(bytes)
+            upLoadGATELog(context,meter,bytes,0,1)
+            getStatus(context,meter,serialPort)
+        }
     }
     private fun OpenMeter(context: Context, meter: Meter) {
         LogUtil.i(TAG,"start Meter Open: ${meter.meterNo}")
-        var serialPort = ComPort.getInstance(context).initComPort(meter.comPort)
-        var bytes = ElectrictyMeterUtil.FrmatOpenCMD(meter.meterNo)
-        serialPort.sendData(bytes)
-        upLoadGATELog(context,meter,bytes,1,1)
-        getStatus(context,meter,serialPort)
+        var brand = meter.brand;
+        if (!TextUtils.isEmpty(brand) && "1" == brand){
+            var serialPort = ComPort.getInstance(context).initComPort(meter.comPort)
+            var bytes = WeiShenElectricityUtil.FrmatOpenCMD(meter.meterNo)
+            serialPort.sendData(bytes)
+            upLoadGATELog(context,meter,bytes,1,1)
+            //            getStatus(context,meter,serialPort)
+        }else{
+            var serialPort = ComPort.getInstance(context).initComPort(meter.comPort)
+            var bytes = ElectrictyMeterUtil.FrmatOpenCMD(meter.meterNo)
+            serialPort.sendData(bytes)
+            upLoadGATELog(context,meter,bytes,1,1)
+            getStatus(context,meter,serialPort)
+        }
     }
     public fun getStatus(context: Context,meter: Meter,serialPort: SerialPort){
         LogUtil.i(TAG,"getStatus")

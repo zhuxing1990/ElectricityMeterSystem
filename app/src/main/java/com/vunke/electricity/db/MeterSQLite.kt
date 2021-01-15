@@ -15,7 +15,7 @@ class MeterSQLite(context: Context?):
     var TAG = "MeterSQLite"
     companion object {
         val DATABASE_NAME = "meter.db"
-        val DATABASE_VERSION = 4
+        val DATABASE_VERSION = 5
         private var instance : MeterSQLite? = null
         @Synchronized
         fun getInstance(context: Context) : MeterSQLite{
@@ -43,7 +43,8 @@ class MeterSQLite(context: Context?):
                     MeterTitle.COM_PORT to TEXT,
                     MeterTitle.USER_ID to INTEGER,
                     MeterTitle.ROOM_LEVEL to TEXT,
-                    MeterTitle.MAGNIFICATION to INTEGER
+                    MeterTitle.MAGNIFICATION to INTEGER,
+                    MeterTitle.BRAND to TEXT
             )
         }catch (e:Exception){
             e.printStackTrace()

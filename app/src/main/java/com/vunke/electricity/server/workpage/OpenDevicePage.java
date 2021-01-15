@@ -11,6 +11,7 @@ import com.vunke.electricity.db.Meter;
 import com.vunke.electricity.device.ComPort;
 import com.vunke.electricity.device.DeviceUtil;
 import com.vunke.electricity.device.ElectrictyMeterUtil;
+import com.vunke.electricity.device.WeiShenElectricityUtil;
 import com.vunke.electricity.server.WebPage;
 import com.vunke.electricity.server.WebRequest;
 import com.vunke.electricity.server.config.EncryptToolNew;
@@ -55,7 +56,16 @@ public class OpenDevicePage implements WebPage {
                     intent.setAction(ConfigService.Companion.getSTOP_QUERY_METER());
                     context.startService(intent);
                     DeviceRunnable.Companion.getInstance().pause0();
-                    byte[] bytes = ElectrictyMeterUtil.FrmatOpenCMD(meter.getMeterNo());
+                    String brand = meter.getBrand();
+                    byte[] bytes;
+                    if (!TextUtils.isEmpty(brand)&& "1".equals(brand)){
+                        bytes = WeiShenElectricityUtil.FrmatOpenCMD(meter.getMeterNo());
+                        LogUtil.i(TAG,"WeiShen FrmatOpenCMD:"+ Utils.bytesToHex(bytes).toUpperCase());
+                    }else{
+                        bytes = ElectrictyMeterUtil.FrmatOpenCMD(meter.getMeterNo());
+                        LogUtil.i(TAG,"FrmatOpenCMD:"+ Utils.bytesToHex(bytes).toUpperCase());
+                    }
+//                    byte[] bytes = ElectrictyMeterUtil.FrmatOpenCMD(meter.getMeterNo());
                     serialPort.sendData(bytes);
                     DeviceUtil.INSTANCE.upLoadGATELog(context,meter,bytes,1,0);
                     responseData.setCode(200);

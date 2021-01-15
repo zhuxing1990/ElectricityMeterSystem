@@ -3,7 +3,6 @@ package com.vunke.electricity.base;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.util.Log;
 
 import com.vunke.electricity.util.LogUtil;
 import com.vunke.electricity.util.LogcatHelper;
@@ -25,7 +24,7 @@ import io.reactivex.functions.Consumer;
     public void onCreate() {
         super.onCreate();
         LogcatHelper.getInstance(this).start();
-        Log.i(TAG, "onCreate: ");
+        LogUtil.i(TAG, "onCreate: ");
         this.application = this;
         initUtil.initWebService(this);
         initUtil.UpgradeApp(application);
@@ -41,7 +40,7 @@ import io.reactivex.functions.Consumer;
     }
 
     private void initDevices() {
-//        initUtil.initDeviceInfo(this);
+//        initUtil.initDeviceInfo(this);//弃用
         initUtil.initConfigService(this);
         try {
             LogUtil.i(TAG,"initRestart");

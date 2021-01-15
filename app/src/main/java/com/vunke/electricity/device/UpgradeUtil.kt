@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.text.TextUtils
 import android.text.format.Formatter
-import android.util.Log
 import com.lzy.okgo.OkGo
 import com.lzy.okgo.callback.FileCallback
 import com.lzy.okgo.model.Progress
@@ -51,7 +50,7 @@ object UpgradeUtil{
                               val versionCode = VersionUtil.getVersionCode("com.android.silenceinstaller", context)
                               val intents = Intent()
                               if (versionCode != -1) {
-                                  Log.i(TAG,"发送重启应用的命令")
+                                  LogUtil.i(TAG,"发送重启应用的命令")
                                   initUtil.initRestart(context);
                                   // 执行静默安装
                                   intents.action = "com.android.SilenceInstall.Start"
@@ -61,7 +60,7 @@ object UpgradeUtil{
                                   context.startService(intents)
                                   LogUtil.i(TAG, "onSuccess: start install:" + response.body().name)
                               } else {
-                                  Log.i(TAG,"发送重启应用的命令")
+                                  LogUtil.i(TAG,"发送重启应用的命令")
                                   initUtil.initRestart(context);
                                   intents.action = Intent.ACTION_VIEW
                                   intents.setDataAndType(Uri.parse("file://" + response.body().toString()),

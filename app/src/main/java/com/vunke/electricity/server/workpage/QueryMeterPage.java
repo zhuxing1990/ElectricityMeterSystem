@@ -2,6 +2,8 @@ package com.vunke.electricity.server.workpage;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.example.x6.serialportlib.SerialPort;
 import com.google.gson.Gson;
@@ -10,6 +12,7 @@ import com.vunke.electricity.db.Meter;
 import com.vunke.electricity.device.ComPort;
 import com.vunke.electricity.device.DeviceUtil;
 import com.vunke.electricity.device.ElectrictyMeterUtil;
+import com.vunke.electricity.device.WeiShenElectricityUtil;
 import com.vunke.electricity.modle.MeterQueryBean;
 import com.vunke.electricity.server.WebRequest;
 import com.vunke.electricity.server.config.BaseWebPage;
@@ -50,13 +53,23 @@ public class QueryMeterPage extends BaseWebPage {
         }
         for (final Meter meter:meters) {
             try {
+                Log.i(TAG, "page: meter:"+meter.toString());
                 String comPort = meter.getComPort();
                 final SerialPort serialPort = ComPort.Companion.getInstance(context).initComPort(comPort);
                 Intent intent = new Intent(context, ConfigService.class);
                 intent.setAction(ConfigService.Companion.getSTOP_QUERY_METER());
                 context.startService(intent);
                 DeviceRunnable.Companion.getInstance().pause0();
-                byte[] bytes = ElectrictyMeterUtil.FrmatQueryCMD(meter.getMeterNo());
+                String brand = meter.getBrand();
+                byte[] bytes;
+                if (!TextUtils.isEmpty(brand)&& "1".equals(brand)){
+                    bytes = WeiShenElectricityUtil.FrmatQueryCMD(meter.getMeterNo());
+                    LogUtil.i(TAG,"WeiShen frmatQueryCMD:"+ Utils.bytesToHex(bytes).toUpperCase());
+                }else{
+                    bytes = ElectrictyMeterUtil.FrmatQueryCMD(meter.getMeterNo());
+                    LogUtil.i(TAG,"frmatQueryCMD:"+ Utils.bytesToHex(bytes).toUpperCase());
+                }
+//                byte[] bytes = ElectrictyMeterUtil.FrmatQueryCMD(meter.getMeterNo());
                 serialPort.sendData(bytes);
                 responseData.setCode(200);
                 responseData.setMessage("已经发送查询命令");
@@ -74,30 +87,57 @@ public class QueryMeterPage extends BaseWebPage {
 //                    responseData.setData(read1);
                     LogUtil.i(TAG,"get Read data:"+ Utils.bytesToHex(byteArray).toUpperCase());
                     LogUtil.i(TAG,"get Read size:"+byteArray.length);
+
                     if (byteArray.length > 10 && byteArray.length == 22) {
                         LogUtil.i(TAG, "get Read : 开始解析电量");
-                        int num = byteArray.length - 10;
-                        byte b1 = byteArray[num];
-                        byte b2 = byteArray[num + 1];
-                        byte b3 = byteArray[byteArray.length-1];
-                        if (ElectrictyMeterUtil.authCode(b1, b2,b3)) {
-                            responseData.setMessage("获取电量信息成功");
-                            LogUtil.i(TAG, "get Read data: 电量应答成功，数据长度正常");
-                            double hextodl = ElectrictyMeterUtil.getElectric(byteArray);
-                            double hextodl2 = ElectrictyMeterUtil.getElectric2(byteArray);
-                            LogUtil.i(TAG, "get Read data: hextodl:" +hextodl);
-                            LogUtil.i(TAG, "get Read data: hextodl2:" +hextodl2);
-                            String getmeterNo = ElectrictyMeterUtil.getMeterNo(byteArray);
-                            LogUtil.i(TAG, "get Read data: meterNo:"+getmeterNo);
-                            MeterQueryBean meterQueryBean = new MeterQueryBean();
-                            meterQueryBean.setBeginCheckNum(hextodl);
-                            meterQueryBean.setBeginCheckNum2(hextodl2);
-                            meterQueryBean.setMeterNo(getmeterNo);
-                            meterQueryBean.setCollectorId(MACUtil.getSERIAL());
-                            meterQueryBean.setBeginCheckCode(Utils.bytesToHex(byteArray).toUpperCase());
-                            responseData.setData(meterQueryBean);
-                            DeviceUtil.INSTANCE.uploadMeterReading(context,getmeterNo,hextodl,hextodl2,Utils.bytesToHex(byteArray).toUpperCase());
+                        byte a = byteArray[0];
+                        byte b = byteArray[1];
+                        byte c = byteArray[2];
+                        byte d = byteArray[3];
+                        if (ElectrictyMeterUtil.getFE_Code(a,b,c,d)){
+                            int num = byteArray.length - 10;
+                            byte b1 = byteArray[num];
+                            byte b2 = byteArray[num + 1];
+                            byte b3 = byteArray[byteArray.length-1];
+                            if (ElectrictyMeterUtil.authCode(b1, b2,b3)) {
+                                responseData.setMessage("获取电量信息成功");
+                                LogUtil.i(TAG, "get Read data: 电量应答成功，数据长度正常");
+                                double hextodl = ElectrictyMeterUtil.getElectric(byteArray);
+                                double hextodl2 = ElectrictyMeterUtil.getElectric2(byteArray);
+                                LogUtil.i(TAG, "get Read data: hextodl:" +hextodl);
+                                LogUtil.i(TAG, "get Read data: hextodl2:" +hextodl2);
+                                String getmeterNo = ElectrictyMeterUtil.getMeterNo(byteArray);
+                                LogUtil.i(TAG, "get Read data: meterNo:"+getmeterNo);
+                                MeterQueryBean meterQueryBean = new MeterQueryBean();
+                                meterQueryBean.setBeginCheckNum(hextodl);
+                                meterQueryBean.setBeginCheckNum2(hextodl2);
+                                meterQueryBean.setMeterNo(getmeterNo);
+                                meterQueryBean.setCollectorId(MACUtil.getSERIAL());
+                                meterQueryBean.setBeginCheckCode(Utils.bytesToHex(byteArray).toUpperCase());
+                                responseData.setData(meterQueryBean);
+                                DeviceUtil.INSTANCE.uploadMeterReading(context,getmeterNo,hextodl,hextodl2,Utils.bytesToHex(byteArray).toUpperCase());
+                            }else{
+                                responseData.setMessage("获取正常应答 失败或者 数据长度不够:"+Utils.bytesToHex(byteArray).toUpperCase());
+                            }
+                        }else{
+                            responseData.setMessage("验证前4位 FE 失败，获取电量信息失败:"+Utils.bytesToHex(byteArray).toUpperCase());
                         }
+                    }else if (byteArray.length>10 && byteArray.length ==20){
+                        LogUtil.i(TAG, "get Read data:weishen");
+                        String meterNo1 = WeiShenElectricityUtil.getMeterNo(byteArray);
+                        Log.i(TAG, " get Read data: weishen meterNo:"+meterNo1);
+                        double hextodl = ElectrictyMeterUtil.getElectric(byteArray);
+                        double hextodl2 = ElectrictyMeterUtil.getElectric2(byteArray);
+                        LogUtil.i(TAG, " get Read data: getElectric:weishen hextodl:"+hextodl);
+                        LogUtil.i(TAG, " get Read data: getElectric:weishen hextodl2:"+hextodl2);
+                        MeterQueryBean meterQueryBean = new MeterQueryBean();
+                        meterQueryBean.setBeginCheckNum(hextodl);
+                        meterQueryBean.setBeginCheckNum2(hextodl2);
+                        meterQueryBean.setMeterNo(meterNo1);
+                        meterQueryBean.setCollectorId(MACUtil.getSERIAL());
+                        meterQueryBean.setBeginCheckCode(Utils.bytesToHex(byteArray).toUpperCase());
+                        responseData.setData(meterQueryBean);
+                        DeviceUtil.INSTANCE.uploadMeterReading(context, meterNo1,hextodl,hextodl2,Utils.bytesToHex(byteArray).toUpperCase());
                     }
                 }
                 String outData = new Gson().toJson(responseData);

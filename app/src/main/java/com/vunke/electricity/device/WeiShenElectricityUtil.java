@@ -1,7 +1,6 @@
 package com.vunke.electricity.device;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.vunke.electricity.util.LogUtil;
 import com.vunke.electricity.util.Utils;
@@ -47,7 +46,7 @@ public class WeiShenElectricityUtil {
         array[18] = 0x4F;
         array[19] = 0x33;
         String dateTime = getDataTimeCode();
-        Log.i(TAG, "FrmatCloseCMD: get dateTime:"+dateTime);
+        LogUtil.i(TAG, "FrmatCloseCMD: get dateTime:"+dateTime);
         byte[] datebyte = Utils.hexStringToByte(dateTime);
         LogUtil.i(TAG,"datebyte:"+Utils.bytesToHex(datebyte).toUpperCase());
         // (byte)(b[i]-0x33)
@@ -96,7 +95,7 @@ public class WeiShenElectricityUtil {
         array[18] = 0x4D;
         array[19] = 0x33;
         String dateTime = getDataTimeCode();
-        Log.i(TAG, "FrmatOpenCMD: get dateTime:"+dateTime);
+        LogUtil.i(TAG, "FrmatOpenCMD: get dateTime:"+dateTime);
         byte[] datebyte = Utils.hexStringToByte(dateTime);
         LogUtil.i(TAG,"datebyte:"+Utils.bytesToHex(datebyte).toUpperCase());
         // (byte)(b[i]-0x33)
@@ -192,4 +191,31 @@ public class WeiShenElectricityUtil {
         return meterNo;
     }
 
+    public static byte[] changetBaudRate(String JeteId){
+        if (TextUtils.isEmpty(JeteId)){
+            return null;
+        }
+        byte[] array = new byte[13];
+        array[0] = 0x68;
+        array[7] = 0x68;
+        try {
+            byte[] bytes = Utils.hexStringToByte(JeteId);
+            array[1] = bytes[5];
+            array[2] = bytes[4];
+            array[3] = bytes[3];
+            array[4] = bytes[2];
+            array[5] = bytes[1];
+            array[6] = bytes [0];
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        array[8] = 0x17;
+        array[9] = 0x01;
+        array[10] = 0x37;
+        array[11] = ElectrictyMeterUtil.makeChacksum(array)[0];
+        array[12] = 0x16;
+        String strArr = Utils.bytesToHex(array).toUpperCase();
+        LogUtil.i(TAG, "changetBaudRate: array："+ strArr);
+        return array;
+    }
 }

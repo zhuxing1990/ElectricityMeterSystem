@@ -2,7 +2,6 @@ package com.vunke.electricity.activity;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -70,17 +69,17 @@ public class MainActivity extends SerialPortActivity {
             double hextodl2 = ElectrictyMeterUtil.getElectric2(buffer);
             LogUtil.i(TAG, "onDataReceived: hextodl：" + hextodl);
             LogUtil.i(TAG, "onDataReceived: hextodl2：" + hextodl2);
-            try {
-                byte[] frmatCloseCMD = WeiShenElectricityUtil.FrmatCloseCMD(meterNo);
-                WriteSerial2(frmatCloseCMD);
-                sleep(2000);
-                byte[] frmatOpenCMD = WeiShenElectricityUtil.FrmatOpenCMD(meterNo);
-                WriteSerial2(frmatOpenCMD);
-
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+//            try {
+////                byte[] frmatCloseCMD = WeiShenElectricityUtil.FrmatCloseCMD(meterNo);
+////                WriteSerial2(frmatCloseCMD);
+////                sleep(2000);
+////                byte[] frmatOpenCMD = WeiShenElectricityUtil.FrmatOpenCMD(meterNo);
+////                WriteSerial2(frmatOpenCMD);
+//
+//
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
 
         }else if(buffer.length == 16){
             String meterNo = ElectrictyMeterUtil.getDeviceMeterNo(buffer);
@@ -102,15 +101,18 @@ public class MainActivity extends SerialPortActivity {
             }
         }
     }
-
+    private SerialPort serialPortS4;
+    private SerialPort serialPortS3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //打开串口
+//        serialPortS4 = ComPort.Companion.getInstance(MainActivity.this).initComPort2400(BaseConfig.COM5);
+//        serialPortS3 = ComPort.Companion.getInstance(MainActivity.this).initComPort2400(BaseConfig.COM4);
         initSerial();
         initSerial2();
-//        QueryMeter();
+
         initView();
 //
 //        String [] StrArr_t1 = {"151700021229","151800032250","151800032246","151800032357","151700041775","151700041773"};
@@ -121,11 +123,24 @@ public class MainActivity extends SerialPortActivity {
 //        String getMeterCode = "68AAAAAAAAAAAA681300DF16";
 //        byte[] getCode = Utils.hexStringToByte(getMeterCode);
 //        WriteSerial(getCode);
+//        WriteSerial2(getCode);
 //-------------------------------------------查询表编号--------------------------------------
 
 
 //        String [] StrArr_t1 = {"001600054791"};
-        String [] StrArr_t1 = {"484527000392"};
+//        String [] StrArr_t1 = {"111800118189"};
+        String [] StrArr_t1 = {"111800118206"};
+//        String [] StrArr_t1 = {"477618000006"};
+//        String meterNo = "502203000642";
+//        String meterNo = "502203000174";
+//        String [] StrArr_t1 = {
+//                                 "502203000640"
+//                                ,"502203000639"
+//                                ,"502203000641"
+//        };
+        ;
+//        String [] StrArr_t1 = {"484527000392"};
+//        String [] StrArr_t1 = {"151700079329"};
 
 
 //--------------------------------跳闸命令----------------------------------------------------
@@ -143,8 +158,8 @@ public class MainActivity extends SerialPortActivity {
 
 
 //---------------------------------查询闸状态------------------------------------------------
-        byte[] frmatStatusCMD = ElectrictyMeterUtil.FrmatStatusCMD(StrArr_t1[0]);
-        WriteSerial(frmatStatusCMD);
+//        byte[] frmatStatusCMD = ElectrictyMeterUtil.FrmatStatusCMD(StrArr_t1[0]);
+//        WriteSerial(frmatStatusCMD);
 //        WriteSerial2(frmatStatusCMD);
 //----------------------------------查询闸状态---------------------------------------------
 
@@ -175,8 +190,14 @@ public class MainActivity extends SerialPortActivity {
 //                "151700041739",
 //
 //        };
+//        String [] StrArr_t1 = {
+//                                "001600054791",
+//                               "484527000392",
+////                               "77618000006"
+//        };
 
-//        query(StrArr_t1,StrArr_t1);
+
+        query(StrArr_t1,StrArr_t1);
 //        query(TestArr.strArr_ERROE,TestArr.strArr_ERROE);
 //        query(TestArr.strArrF1,TestArr.strArrF1);
 //        query(TestArr.strArr_F1,TestArr.strArr_F1);
@@ -200,7 +221,10 @@ public class MainActivity extends SerialPortActivity {
 //        query(TestArr.strArr22_23,TestArr.strArr22_23);
 //        TestQuery();
 //        TestReboot();
+
     }
+
+
 
     public void query(final String[] str1, final String[] str2) {
 
@@ -209,36 +233,90 @@ public class MainActivity extends SerialPortActivity {
             public void run() {
                 try {
                     if (!isDestroy) {
-//                        for (int i = 0; i < str1.length; i++) {
-//// //                           sleep(4000);
-//                            sleep(1000);
-//                            LogUtil.i(TAG,"发送str1:"+str1[i]);
-//                            byte[] frmatCMD = ElectrictyMeterUtil.FrmatQueryCMD(str1[i]);
-//                            WriteSerial(frmatCMD);
-//                        }
-//                        for (int i = 0; i < str2.length; i++) {
-////                            sleep(4000);
-//                            sleep(1000);
-//                            LogUtil.i(TAG, "发送str2:" + str2[i]);
-//                            byte[] frmatCMD = ElectrictyMeterUtil.FrmatQueryCMD(str2[i]);
-//                            WriteSerial2(frmatCMD);
-//                        }
+//                        String data = "68 AA AA AA AA AA AA 68 13 00 DF 16";
+//                        String replace_data = data.replace(" ", "");
+//                        Log.i(TAG, "onCreate: replace_data:"+replace_data);
+//                        byte[]  databyte= Utils.HexString2Bytes(replace_data);
+//                        Log.i(TAG, "onCreate WeiShenTest : databyte:"+Utils.bytesToHex(databyte).toUpperCase());
+//                        WriteSerial(databyte);
+//                        sleep(1000);
+//                        WriteSerial2(databyte);
+
                         for (int i = 0; i < str1.length; i++) {
 // //                           sleep(4000);
-                            sleep(1000);
-                            LogUtil.i(TAG,"发送str1:"+str1[i]);
-                            byte[] frmatCMD = WeiShenElectricityUtil.FrmatQueryCMD(str1[i]);
+//                            sleep(1000);
+//                            LogUtil.i(TAG,"发送str1:"+str1[i]);
+                            byte[] frmatCMD = ElectrictyMeterUtil.FrmatQueryCMD(str1[i]);
                             WriteSerial(frmatCMD);
+                            LogUtil.i(TAG," frmatCMD:"+ Utils.bytesToHex(frmatCMD).toUpperCase());
+                            sleep(2000);
+                            byte[] frmatOpenCMD = ElectrictyMeterUtil.FrmatOpenCMD(str1[i]);
+                            WriteSerial(frmatOpenCMD);
+                            LogUtil.i(TAG," frmatOpenCMD:"+ Utils.bytesToHex(frmatOpenCMD).toUpperCase());
                         }
+
+                        for (int i = 0; i < str1.length; i++) {
+//                            sleep(2000);
+//                            byte[] changetBaudRate = WeiShenElectricityUtil.changetBaudRate(str1[i]);
+//                            LogUtil.i(TAG,"WeiShenTest changetBaudRate:"+ Utils.bytesToHex(changetBaudRate).toUpperCase());
+//                            serialPortS4.sendData(changetBaudRate);
+//                            serialPortS3.sendData(changetBaudRate);
+
+                        }
+//                        sleep(2000);
+//                        initSerial2();
+//                        initSerial();
+                        sleep(2000);
                         for (int i = 0; i < str2.length; i++) {
 //                            sleep(4000);
-                            sleep(1000);
+//                            sleep(2000);
                             LogUtil.i(TAG, "发送str2:" + str2[i]);
-                            byte[] frmatCMD = WeiShenElectricityUtil.FrmatQueryCMD(str2[i]);
+                            byte[] frmatCMD = ElectrictyMeterUtil.FrmatQueryCMD(str2[i]);
                             WriteSerial2(frmatCMD);
+                            LogUtil.i(TAG," frmatCMD2:"+ Utils.bytesToHex(frmatCMD).toUpperCase());
+                            sleep(2000);
+                            byte[] frmatOpenCMD = ElectrictyMeterUtil.FrmatOpenCMD(str1[i]);
+                            WriteSerial2(frmatOpenCMD);
+                            LogUtil.i(TAG," frmatOpenCMD2:"+ Utils.bytesToHex(frmatOpenCMD).toUpperCase());
                         }
+                        for (int i = 0; i < str1.length; i++) {
+// //                           sleep(4000);
+//                            LogUtil.i(TAG,"发送str1:"+str1[i]);
+//                            byte[] frmatCMD = WeiShenElectricityUtil.FrmatQueryCMD(str1[i]);
+//                            WriteSerial(frmatCMD);
+
+//                            byte[] frmatCloseCMD2 = WeiShenElectricityUtil.FrmatCloseCMD(str1[i]);
+//                            LogUtil.i(TAG,"WeiShenTest frmatCloseCMD2:"+ Utils.bytesToHex(frmatCloseCMD2).toUpperCase());
+//                            WriteSerial(frmatCloseCMD2);
+//                            sleep(2000);
+//                            byte[] frmatOpenCMD2 = WeiShenElectricityUtil.FrmatOpenCMD(str1[i]);
+//                            LogUtil.i(TAG,"WeiShenTest frmatOpenCMD2:"+ Utils.bytesToHex(frmatOpenCMD2).toUpperCase());
+//                            WriteSerial(frmatOpenCMD2);
+//                            sleep(2000);
+//                            byte[] frmatQueryCMD2 = WeiShenElectricityUtil.FrmatQueryCMD(str1[i]);
+//                            LogUtil.i(TAG,"WeiShenTest frmatQueryCMD2:"+ Utils.bytesToHex(frmatQueryCMD2).toUpperCase());
+//                            WriteSerial(frmatQueryCMD2);
+                        }
+//                        for (int i = 0; i < str2.length; i++) {
+////                            sleep(4000);
+////                            sleep(1000);
+////                            LogUtil.i(TAG, "发送str2:" + str2[i]);
+////                            byte[] frmatCMD = WeiShenElectricityUtil.FrmatQueryCMD(str2[i]);
+////                            WriteSerial2(frmatCMD);
+//
+////                            byte[] frmatCloseCMD2 = WeiShenElectricityUtil.FrmatCloseCMD(str1[i]);
+////                            LogUtil.i(TAG,"WeiShenTest frmatCloseCMD2:"+ Utils.bytesToHex(frmatCloseCMD2).toUpperCase());
+////                            WriteSerial2(frmatCloseCMD2);
+////                            byte[] frmatOpenCMD2 = WeiShenElectricityUtil.FrmatOpenCMD(str1[i]);
+////                            LogUtil.i(TAG,"WeiShenTest frmatOpenCMD2:"+ Utils.bytesToHex(frmatOpenCMD2).toUpperCase());
+////                            WriteSerial2(frmatCloseCMD2);
+//                            sleep(2000);
+//                            byte[] frmatQueryCMD2 = WeiShenElectricityUtil.FrmatQueryCMD(str2[i]);
+//                            LogUtil.i(TAG,"WeiShenTest frmatQueryCMD2:"+ Utils.bytesToHex(frmatQueryCMD2).toUpperCase());
+//                            WriteSerial2(frmatQueryCMD2);
+//                        }
                     }
-                    Log.i(TAG,"query over");
+                    LogUtil.i(TAG,"query over");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

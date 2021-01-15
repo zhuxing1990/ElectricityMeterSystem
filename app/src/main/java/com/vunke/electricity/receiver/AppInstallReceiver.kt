@@ -24,19 +24,19 @@ class AppInstallReceiver : BroadcastReceiver() {
                    if (schemeSpecificPart .equals(context.packageName)){
                        LogUtil.i(TAG,"upgrade success ,start app")
                        try {
-                           Log.i(TAG,"发送重启应用的命令")
+                           LogUtil.i(TAG,"发送重启应用的命令")
                            initUtil.initRestart(context);
                        }catch (e:Exception){
                            e.printStackTrace()
                        }
                    }
                }else if (Intent.ACTION_PACKAGE_REMOVED.equals(action)){
-                   Log.i(TAG,"应用被卸载")
+                   LogUtil.i(TAG,"应用被卸载")
                    val packageName = intent.data.schemeSpecificPart
                    LogUtil.i(TAG,"get package:$packageName")
                    if (packageName.equals(context.packageName)){
                        try {
-                           Log.i(TAG,"发送重启应用的命令")
+                           LogUtil.i(TAG,"发送重启应用的命令")
                            initUtil.initRestart(context);
                        }catch (e:Exception){
                            e.printStackTrace()

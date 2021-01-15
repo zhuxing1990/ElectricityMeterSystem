@@ -67,6 +67,7 @@ public class TheMeterBean {
         private String roomLevel;
         private Long userId;
         private Long magnification;
+        private String brand;
 
         public Double getBeginCheckNum() {
             return beginCheckNum;
@@ -155,6 +156,13 @@ public class TheMeterBean {
             this.magnification = magnification;
         }
 
+        public String getBrand() {
+            return brand;
+        }
+
+        public void setBrand(String brand) {
+            this.brand = brand;
+        }
 
         @Override
         public String toString() {
@@ -170,9 +178,10 @@ public class TheMeterBean {
                     ", roomLevel='" + roomLevel + '\'' +
                     ", userId=" + userId +
                     ", magnification=" + magnification +
+                    ", brand='" + brand + '\'' +
                     '}';
         }
-    }
+}
 
     @Override
     public String toString() {

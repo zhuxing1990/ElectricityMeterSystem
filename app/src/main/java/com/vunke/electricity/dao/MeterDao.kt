@@ -48,6 +48,7 @@ class  MeterDao(mContext:Context){
                 result[MeterTitle.USER_ID] = "$userId"
                 result[MeterTitle.ROOM_LEVEL] = roomLevel
                 result[MeterTitle.MAGNIFICATION] = "$magnification"
+                result[MeterTitle.BRAND] = brand
             }
         }catch (e:Exception){
             e.printStackTrace()
@@ -113,6 +114,7 @@ class  MeterDao(mContext:Context){
                 varargs.put(MeterTitle.USER_ID,data.userId)
                 varargs.put(MeterTitle.ROOM_LEVEL,data.roomLevel)
                 varargs.put(MeterTitle.MAGNIFICATION,data.magnification)
+                varargs.put(MeterTitle.BRAND,data.brand)
                 var condition = "meterNo=${data.meterNo}"
                 count = update(MeterTitle.TABLE_NAME,varargs,condition,null)
             }
@@ -138,6 +140,7 @@ class  MeterDao(mContext:Context){
                     varargs.put(MeterTitle.USER_ID,it.userId)
                     varargs.put(MeterTitle.ROOM_LEVEL,it.roomLevel)
                     varargs.put(MeterTitle.MAGNIFICATION,it.magnification)
+                    varargs.put(MeterTitle.BRAND,it.brand)
                     var condition = "meterNo=$meterNo"
                     update(MeterTitle.TABLE_NAME,varargs,condition,null)
                 })
@@ -179,8 +182,9 @@ class  MeterDao(mContext:Context){
                         var userId = columns[MeterTitle.USER_ID] as Long
                         var roomLevel = columns[MeterTitle.ROOM_LEVEL] as String
                         var magnification = columns[MeterTitle.MAGNIFICATION] as Long
+                        var brand = columns[MeterTitle.BRAND] as String
                         return Meter(
-                            meterId ,MeterNo ,currCheckNum,preCheckNum,preCheckNumTwo,checkDate,collectorId,comPort,userId,roomLevel,magnification)
+                            meterId ,MeterNo ,currCheckNum,preCheckNum,preCheckNumTwo,checkDate,collectorId,comPort,userId,roomLevel,magnification,brand)
                     }
                 })
             }
@@ -210,7 +214,8 @@ class  MeterDao(mContext:Context){
                         MeterTitle.COM_PORT,
                         MeterTitle.USER_ID,
                         MeterTitle.ROOM_LEVEL,
-                        MeterTitle.MAGNIFICATION
+                        MeterTitle.MAGNIFICATION,
+                        MeterTitle.BRAND
                 )
                 //.whereArgs("")    设置查询条件
                 //难点4
@@ -228,9 +233,10 @@ class  MeterDao(mContext:Context){
                         var userId = columns[MeterTitle.USER_ID] as Long
                         var roomLevel = columns[MeterTitle.ROOM_LEVEL] as String
                         var magnification = columns[MeterTitle.MAGNIFICATION] as Long
+                        var brand = columns[MeterTitle.BRAND] as String
                         return Meter(
 //                                _id,
-                                meterId ,meterNo ,currCheckNum,preCheckNum,preCheckNumTwo,checkDate,collectorId,comPort,userId,roomLevel,magnification)
+                                meterId ,meterNo ,currCheckNum,preCheckNum,preCheckNumTwo,checkDate,collectorId,comPort,userId,roomLevel,magnification,brand)
                     }
                 })
             }
